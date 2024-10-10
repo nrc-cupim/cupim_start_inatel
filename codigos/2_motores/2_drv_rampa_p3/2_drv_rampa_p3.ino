@@ -5,6 +5,12 @@ ControllerPtr myControllers[BP32_MAX_GAMEPADS];
 bool roboLigado;
 
 void desligaRobo() {
+  digitalWrite(SENTIDO_ARMA1, LOW);
+  analogWrite(VELOCIDADE_ARMA1, 0);
+
+  digitalWrite(SENTIDO_ARMA2, LOW);
+  analogWrite(VELOCIDADE_ARMA2, 0);
+
   digitalWrite(SENTIDO_MOTOR_ESQUERDO, LOW);
   analogWrite(VELOCIDADE_MOTOR_ESQUERDO, 0);
 
@@ -37,8 +43,6 @@ void onConnectedController(ControllerPtr ctl) {
   }
 }
 
-
-
 void onDisconnectedController(ControllerPtr ctl) {
   for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
     if (myControllers[i] == ctl) {
@@ -52,6 +56,9 @@ void onDisconnectedController(ControllerPtr ctl) {
       break;
     }
   }
+}
+
+void logicaFuncionamentoRampa() {
 }
 
 void processControllers() {
@@ -79,17 +86,35 @@ void processControllers() {
 
       if (roboLigado) {
 
-        // Lê valor em Y do analógico direito (R-right).
+        // Lógica de funcionamento da rampa
+        int32_t pressaoR2 = myController->throttle();
+        int32_t pressaoL2 = myController->brake();
+        int pwmArmas;
+
+        if (pressaoR2 > toleranciaGatilhos) {
+          digitalWrite(SENTIDO_ARMA1, HIGH);
+          digitalWrite(SENTIDO_ARMA2, HIGH);
+          pwmArmas = map(pressaoR2, minR2, maxR2, maxPWM, minPWM);
+        } else if (pressaoR2 > toleranciaGatilhos) {
+          digitalWrite(SENTIDO_ARMA1, LOW);
+          digitalWrite(SENTIDO_ARMA2, LOW);
+          pwmArmas = map(pressaoL2, minL2, maxL2, maxPWM, minPWM);
+        } else {
+          digitalWrite(SENTIDO_ARMA1, LOW);
+          digitalWrite(SENTIDO_ARMA2, LOW);
+          pwmArmas = 0;
+        }
+
+        analogWrite(VELOCIDADE_ARMA1, pwmArmas);
+        analogWrite(VELOCIDADE_ARMA2, pwmArmas);
+
+        // Lê valor em Y do analógico direito (R-right) e exibe valor na serial.
         int32_t valorAnalogicoDireito = -myController->axisRY();
-
-        // Lê valor em X do analógico esquerdo (L-left).
-        int32_t valorAnalogicoEsquerdo = myController->axisX();
-
-        // Exibe valores no monitor serial.
-
         Serial.print("Y analogico R: ");
         Serial.println(valorAnalogicoDireito);
 
+        // Lê valor em X do analógico esquerdo (L-left) e exibe valor na serial.
+        int32_t valorAnalogicoEsquerdo = myController->axisX();
         Serial.print("X analogico L: ");
         Serial.println(valorAnalogicoEsquerdo);
 
@@ -225,8 +250,14 @@ void setup() {
   // Desparea os controles que haviam sido conectados anteriormente.
   BP32.forgetBluetoothKeys();
 
-  // Configura pinos da ESP32 como saída.
+  // Configura pinos da ESP32 para controle dos motores de arma.
+  pinMode(SENTIDO_ARMA1, OUTPUT);
+  pinMode(VELOCIDADE_ARMA1, OUTPUT);
 
+  pinMode(SENTIDO_ARMA2, OUTPUT);
+  pinMode(VELOCIDADE_ARMA2, OUTPUT);
+
+  // Configura pinos da ESP32 para controle dos motores de locomoção.
   pinMode(SENTIDO_MOTOR_ESQUERDO, OUTPUT);
   pinMode(VELOCIDADE_MOTOR_ESQUERDO, OUTPUT);
 

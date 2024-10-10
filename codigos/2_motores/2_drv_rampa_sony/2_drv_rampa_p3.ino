@@ -43,8 +43,6 @@ void onConnectedController(ControllerPtr ctl) {
   }
 }
 
-
-
 void onDisconnectedController(ControllerPtr ctl) {
   for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
     if (myControllers[i] == ctl) {
@@ -58,6 +56,9 @@ void onDisconnectedController(ControllerPtr ctl) {
       break;
     }
   }
+}
+
+void logicaFuncionamentoRampa() {
 }
 
 void processControllers() {
@@ -85,45 +86,35 @@ void processControllers() {
 
       if (roboLigado) {
 
-        uint16_t botoesPressionados = myController->buttons();
+        // Lógica de funcionamento da rampa
+        int32_t pressaoR2 = myController->throttle();
+        int32_t pressaoL2 = myController->brake();
+        int pwmArmas;
 
-        // Se L1 for presionado, desliga motores da arma.
-        if (botoesPressionados == 0x0010) {
-          digitalWrite(SENTIDO_ARMA1, LOW);
-          analogWrite(VELOCIDADE_ARMA1, 0);
-
-          digitalWrite(SENTIDO_ARMA2, LOW);
-          analogWrite(VELOCIDADE_ARMA2, 0);
-
-          Serial.print("Arma desligada\n");
-        }
-
-        // Se R1 for presionado, liga motores da arma.
-        else if (botoesPressionados == 0x0020) {
-          digitalWrite(SENTIDO_ARMA1, LOW);
-          analogWrite(VELOCIDADE_ARMA1, 255);
-
+        if (pressaoR2 > toleranciaGatilhos) {
+          digitalWrite(SENTIDO_ARMA1, HIGH);
           digitalWrite(SENTIDO_ARMA2, HIGH);
-          analogWrite(VELOCIDADE_ARMA2, 0);
-
-          // Ao acoplar os motores na arma, deve-se atentar para o sentido de rotação de cada um.
-          // Deve-se garantir que eles não rodem em sentidos opostos. 
-          // Caso contrário, um motor servirá de carga para o outro, o que danificará os componentes.
-
-          Serial.print("Arma ligada\n");
+          pwmArmas = map(pressaoR2, minR2, maxR2, maxPWM, minPWM);
+        } else if (pressaoR2 > toleranciaGatilhos) {
+          digitalWrite(SENTIDO_ARMA1, LOW);
+          digitalWrite(SENTIDO_ARMA2, LOW);
+          pwmArmas = map(pressaoL2, minL2, maxL2, maxPWM, minPWM);
+        } else {
+          digitalWrite(SENTIDO_ARMA1, LOW);
+          digitalWrite(SENTIDO_ARMA2, LOW);
+          pwmArmas = 0;
         }
 
-        // Lê valor em Y do analógico direito (R-right).
+        analogWrite(VELOCIDADE_ARMA1, pwmArmas);
+        analogWrite(VELOCIDADE_ARMA2, pwmArmas);
+
+        // Lê valor em Y do analógico direito (R-right) e exibe valor na serial.
         int32_t valorAnalogicoDireito = -myController->axisRY();
-
-        // Lê valor em X do analógico esquerdo (L-left).
-        int32_t valorAnalogicoEsquerdo = myController->axisX();
-
-        // Exibe valores no monitor serial.
-
         Serial.print("Y analogico R: ");
         Serial.println(valorAnalogicoDireito);
 
+        // Lê valor em X do analógico esquerdo (L-left) e exibe valor na serial.
+        int32_t valorAnalogicoEsquerdo = myController->axisX();
         Serial.print("X analogico L: ");
         Serial.println(valorAnalogicoEsquerdo);
 
@@ -266,7 +257,7 @@ void setup() {
   pinMode(SENTIDO_ARMA2, OUTPUT);
   pinMode(VELOCIDADE_ARMA2, OUTPUT);
 
-// Configura pinos da ESP32 para controle dos motores de locomoção.
+  // Configura pinos da ESP32 para controle dos motores de locomoção.
   pinMode(SENTIDO_MOTOR_ESQUERDO, OUTPUT);
   pinMode(VELOCIDADE_MOTOR_ESQUERDO, OUTPUT);
 
