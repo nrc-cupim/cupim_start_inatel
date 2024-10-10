@@ -95,7 +95,7 @@ void processControllers() {
         } else if (pressaoL2 > toleranciaGatilhos) {
           digitalWrite(SENTIDO_ARMA1, LOW);
           digitalWrite(SENTIDO_ARMA2, LOW);
-          pwmArmas = map(pressaoL2, minL2, maxL2, maxPWM, minPWM);
+          pwmArmas = map(pressaoL2, minL2, maxL2, minPWM, maxPWM);
         } else {
           digitalWrite(SENTIDO_ARMA1, LOW);
           digitalWrite(SENTIDO_ARMA2, LOW);
