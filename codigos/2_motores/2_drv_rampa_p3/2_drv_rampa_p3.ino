@@ -58,9 +58,6 @@ void onDisconnectedController(ControllerPtr ctl) {
   }
 }
 
-void logicaFuncionamentoRampa() {
-}
-
 void processControllers() {
   for (auto myController : myControllers) {
 
@@ -95,7 +92,7 @@ void processControllers() {
           digitalWrite(SENTIDO_ARMA1, HIGH);
           digitalWrite(SENTIDO_ARMA2, HIGH);
           pwmArmas = map(pressaoR2, minR2, maxR2, maxPWM, minPWM);
-        } else if (pressaoR2 > toleranciaGatilhos) {
+        } else if (pressaoL2 > toleranciaGatilhos) {
           digitalWrite(SENTIDO_ARMA1, LOW);
           digitalWrite(SENTIDO_ARMA2, LOW);
           pwmArmas = map(pressaoL2, minL2, maxL2, maxPWM, minPWM);

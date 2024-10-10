@@ -22,8 +22,8 @@
 
 // Limites dos valores retornados ao movimentar os analógicos (R - cima/baixo) (L - esquerda/direita)
 
-const int32_t minAnalogR_Y = -508, centerAnalogR_Y = 0, maxAnalogR_Y = 512;  // Valores reais * -1
-const int32_t minAnalogL_X = -512, centerAnalogL_X = 0, maxAnalogL_X = 508;
+const int32_t minAnalogR_Y = -512, centerAnalogR_Y = -4, maxAnalogR_Y = 508;  // Valores reais * -1
+const int32_t minAnalogL_X = -508, centerAnalogL_X = 4, maxAnalogL_X = 512;
 
 const int32_t toleranciaAnalogico = 10;  // zona morta do controle
 
@@ -31,8 +31,8 @@ const int32_t toleranciaAnalogico = 10;  // zona morta do controle
 
 // Limites dos valores retornados ao prescionar L2 e R2
 
-const int32_t minL2 = 0, maxL2 = 1023;
-const int32_t minR2 = 0, maxR2 = 1023;
+const int32_t minL2 = 0, maxL2 = 1020;
+const int32_t minR2 = 0, maxR2 = 1020;
 const int32_t toleranciaGatilhos = 10;
 
 /* ............................................ Saída PWM ............................................. */
