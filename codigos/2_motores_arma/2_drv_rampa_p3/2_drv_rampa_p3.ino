@@ -88,14 +88,14 @@ void processControllers() {
         int32_t pressaoL2 = myController->brake();
         int pwmArmas;
 
-        if (pressaoR2 > toleranciaGatilhos) {
+        if (pressaoL2 > toleranciaGatilhos) {
           digitalWrite(SENTIDO_ARMA1, HIGH);
           digitalWrite(SENTIDO_ARMA2, HIGH);
-          pwmArmas = map(pressaoR2, minR2, maxR2, maxPWM, minPWM);
-        } else if (pressaoL2 > toleranciaGatilhos) {
+          pwmArmas = map(pressaoL2, minL2, maxL2, maxPWM, minPWM);
+        } else if (pressaoR2 > toleranciaGatilhos) {
           digitalWrite(SENTIDO_ARMA1, LOW);
           digitalWrite(SENTIDO_ARMA2, LOW);
-          pwmArmas = map(pressaoL2, minL2, maxL2, minPWM, maxPWM);
+          pwmArmas = map(pressaoR2, minR2, maxR2, minPWM, maxPWM);
         } else {
           digitalWrite(SENTIDO_ARMA1, LOW);
           digitalWrite(SENTIDO_ARMA2, LOW);
