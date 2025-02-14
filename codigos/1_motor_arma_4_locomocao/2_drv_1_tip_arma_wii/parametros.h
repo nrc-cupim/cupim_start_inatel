@@ -22,8 +22,8 @@
 // Cima - Baixo +
 // Direita + Esquerda -
 
-const int32_t minAnalogR_Y = -392, centerAnalogR_Y = -12, maxAnalogR_Y = 384;  // Valores reais * -1
-const int32_t minAnalogR_X = -384, centerAnalogR_X = -12, maxAnalogR_X = 404;
+const int32_t minAnalogR_Y = -392, centerAnalogR_Y = 12, maxAnalogR_Y = 392;  // Valores reais * -1
+const int32_t minAnalogR_X = -404, centerAnalogR_X = -12, maxAnalogR_X = 388;
 
 const int32_t toleranciaAnalogico = 10;  // zona morta do controle
 
