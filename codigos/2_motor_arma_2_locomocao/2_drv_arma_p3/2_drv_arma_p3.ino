@@ -107,7 +107,7 @@ void processControllers() {
           analogWrite(VELOCIDADE_ARMA2, 0);
 
           // Ao acoplar os motores na arma, deve-se atentar para o sentido de rotação de cada um.
-          // Deve-se garantir que eles não rodem em sentidos opostos. 
+          // Deve-se garantir que eles não rodem em sentidos opostos.
           // Caso contrário, um motor servirá de carga para o outro, o que danificará os componentes.
 
           Serial.print("Arma ligada\n");
@@ -238,6 +238,16 @@ void processControllers() {
         Serial.print("PWM Esquerdo: ");
         Serial.println(pwmMotorEsquerdo);
 
+        if (pwmMotorDireito > maxPWM)
+          pwmMotorDireito = maxPWM;
+        else if (pwmMotorDireito < minPWM)
+          pwmMotorDireito = minPWM;
+
+        if (pwmMotorEsquerdo > maxPWM)
+          pwmMotorEsquerdo = maxPWM;
+        else if (pwmMotorEsquerdo < minPWM)
+          pwmMotorEsquerdo = minPWM;
+
         analogWrite(VELOCIDADE_MOTOR_DIREITO, pwmMotorDireito);
         analogWrite(VELOCIDADE_MOTOR_ESQUERDO, pwmMotorEsquerdo);
       }
@@ -266,7 +276,7 @@ void setup() {
   pinMode(SENTIDO_ARMA2, OUTPUT);
   pinMode(VELOCIDADE_ARMA2, OUTPUT);
 
-// Configura pinos da ESP32 para controle dos motores de locomoção.
+  // Configura pinos da ESP32 para controle dos motores de locomoção.
   pinMode(SENTIDO_MOTOR_ESQUERDO, OUTPUT);
   pinMode(VELOCIDADE_MOTOR_ESQUERDO, OUTPUT);
 
