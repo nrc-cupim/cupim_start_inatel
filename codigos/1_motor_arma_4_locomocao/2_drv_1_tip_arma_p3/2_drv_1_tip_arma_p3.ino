@@ -229,6 +229,16 @@ void processControllers() {
         Serial.print("PWM Esquerdo: ");
         Serial.println(pwmMotorEsquerdo);
 
+        if (pwmMotorDireito > maxPWM)
+          pwmMotorDireito = maxPWM;
+        else if (pwmMotorDireito < minPWM)
+          pwmMotorDireito = minPWM;
+
+        if (pwmMotorEsquerdo > maxPWM)
+          pwmMotorEsquerdo = maxPWM;
+        else if (pwmMotorEsquerdo < minPWM)
+          pwmMotorEsquerdo = minPWM;
+
         analogWrite(VELOCIDADE_MOTOR_DIREITO1, pwmMotorDireito);
         analogWrite(VELOCIDADE_MOTOR_ESQUERDO1, pwmMotorEsquerdo);
         analogWrite(VELOCIDADE_MOTOR_DIREITO2, pwmMotorDireito);
