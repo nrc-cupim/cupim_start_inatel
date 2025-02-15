@@ -11,19 +11,28 @@
 #include <uni.h>  // inclusão da biblioteca que implementa o filtro
 
 // Substitua o texto entre aspas pelo endereço MAC do seu controle.
-static const char* endereco_mac_controle_1 = "98:b6:a7:7e:3b:f9";
+static const char* endereco_mac_controle_1 = "98:b6:2b:e7:21:e5";
+static const char* endereco_mac_controle_2 = "98:b6:ea:67:9f:fb";
+static const char* endereco_mac_controle_3 = "98:b6:5d:0f:2b:c2";
+static const char* endereco_mac_controle_4 = "98:b6:a7:7e:3b:f9";
 
 void setup() {
 
   // Converte endereço MAC e salva na variável endereco_1
-  bd_addr_t endereco_1;
+  bd_addr_t endereco_1, endereco_2, endereco_3, endereco_4;
   sscanf_bd_addr(endereco_mac_controle_1, endereco_1);
+  sscanf_bd_addr(endereco_mac_controle_2, endereco_2);
+  sscanf_bd_addr(endereco_mac_controle_3, endereco_3);
+  sscanf_bd_addr(endereco_mac_controle_4, endereco_4);
 
   // Remove endereço bluetooth da lista de permissão
   // uni_bt_allowlist_remove_addr(endereco_1);
 
   // Adiciona endereço à lista de permissão.
   uni_bt_allowlist_add_addr(endereco_1);
+  uni_bt_allowlist_add_addr(endereco_2);
+  uni_bt_allowlist_add_addr(endereco_3);
+  uni_bt_allowlist_add_addr(endereco_4);
 
   // Desabilita lista de permissão.
   // uni_bt_allowlist_set_enabled(false);
