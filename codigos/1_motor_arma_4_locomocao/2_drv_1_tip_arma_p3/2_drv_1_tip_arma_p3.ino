@@ -98,7 +98,7 @@ void processControllers() {
         int32_t valorAnalogicoDireito = -myController->axisRY();
 
         // Lê valor em X do analógico esquerdo (L-left).
-        int32_t valorAnalogicoEsquerdo = myController->axisX();
+        int32_t valorAnalogicoEsquerdo = -myController->axisX();
 
         // Exibe valores no monitor serial.
 
