@@ -4,6 +4,8 @@
 
 #include <Arduino.h>
 
+#define PINO_LED_INTERNO 2
+
 #define PINO_1_MOTOR_ESQUERDO 33
 #define PINO_2_MOTOR_ESQUERDO 32
 
