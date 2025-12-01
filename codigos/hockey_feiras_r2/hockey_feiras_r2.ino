@@ -135,7 +135,7 @@ void processControllers() {
 
         if (direitoVesquerdoH) {
           // Lê valor em Y do analógico direito (R-right).
-          valorAnalogicoV = -myController->axisRY();
+          valorAnalogicoV = myController->axisRY();
 
           // Lê valor em X do analógico esquerdo (L-left).
           valorAnalogicoH = myController->axisX();
@@ -146,7 +146,7 @@ void processControllers() {
           valorAnalogicoH = myController->axisRX();
 
           // Lê valor em Y do analógico esquerdo (L-left).
-          valorAnalogicoV = -myController->axisY();
+          valorAnalogicoV = myController->axisY();
         }
 
         // Exibe valores no monitor serial.
@@ -158,102 +158,86 @@ void processControllers() {
 
         int pwmMotorDireito1, pwmMotorDireito2, pwmMotorEsquerdo1, pwmMotorEsquerdo2;
 
-        if (valorAnalogicoV > (CENTER_ANALOG_Y + TOLERANCIA_ANALOGICO)) {
+        // Analógico Y movimentado para trás
+        if (valorAnalogicoV > (PARADO_JOYSTICK_Y + TOLERANCIA_JOYSTICK)) {
+          pwmMotorDireito1 = MIN_PWM;
+          pwmMotorEsquerdo2 = MIN_PWM;
 
-          pwmMotorDireito1 = MAX_PWM;
-          pwmMotorEsquerdo1 = MAX_PWM;
-
-          if (valorAnalogicoH > (CENTER_ANALOG_X + TOLERANCIA_ANALOGICO)) {
-
+          // Analógico X movimentado para direita
+          if (valorAnalogicoH > (PARADO_JOYSTICK_X + TOLERANCIA_JOYSTICK)) {
             pwmMotorDireito2 = map(valorAnalogicoV - valorAnalogicoH,
-                                   CENTER_ANALOG_Y - MAX_ANALOG_X,
-                                   MAX_ANALOG_Y - CENTER_ANALOG_X,
-                                   MAX_PWM,
-                                   MIN_PWM);
-
-            pwmMotorEsquerdo2 = map(valorAnalogicoV + valorAnalogicoH,
-                                    CENTER_ANALOG_Y + CENTER_ANALOG_X,
-                                    MAX_ANALOG_Y + MAX_ANALOG_X,
-                                    MAX_PWM,
-                                    MIN_PWM);
+                                   PARADO_JOYSTICK_Y - MAX_JOYSTICK_X,
+                                   MAX_JOYSTICK_Y - PARADO_JOYSTICK_X,
+                                   MIN_PWM, MAX_PWM);
+            pwmMotorEsquerdo1 = map(valorAnalogicoV, PARADO_JOYSTICK_Y, MAX_JOYSTICK_Y, MIN_PWM, MAX_PWM);
           }
 
-          else if (valorAnalogicoH < (CENTER_ANALOG_X - TOLERANCIA_ANALOGICO)) {
-
-            pwmMotorDireito2 = map(valorAnalogicoV - valorAnalogicoH,
-                                   CENTER_ANALOG_Y - CENTER_ANALOG_X,
-                                   MAX_ANALOG_Y - MIN_ANALOG_X,
-                                   MAX_PWM,
-                                   MIN_PWM);
-
-            pwmMotorEsquerdo2 = map(valorAnalogicoV + valorAnalogicoH,
-                                    CENTER_ANALOG_Y + MIN_ANALOG_X,
-                                    MAX_ANALOG_Y + CENTER_ANALOG_X,
-                                    MAX_PWM,
-                                    MIN_PWM);
+          // Analógico X movimentado para esquerda
+          else if (valorAnalogicoH < (PARADO_JOYSTICK_X - TOLERANCIA_JOYSTICK)) {
+            pwmMotorDireito2 = map(valorAnalogicoV, PARADO_JOYSTICK_Y, MAX_JOYSTICK_Y, MIN_PWM, MAX_PWM);
+            pwmMotorEsquerdo1 = map(valorAnalogicoV + valorAnalogicoH,
+                                    PARADO_JOYSTICK_Y + MIN_JOYSTICK_X,
+                                    MAX_JOYSTICK_Y + PARADO_JOYSTICK_X,
+                                    MIN_PWM, MAX_PWM);
           }
 
+          // Analógico X não movimentado
           else {
-            pwmMotorDireito2 = map(valorAnalogicoV, CENTER_ANALOG_Y, MAX_ANALOG_Y, MAX_PWM, MIN_PWM);
-            pwmMotorEsquerdo2 = map(valorAnalogicoV, CENTER_ANALOG_Y, MAX_ANALOG_Y, MAX_PWM, MIN_PWM);
+            pwmMotorDireito2 = map(valorAnalogicoV, PARADO_JOYSTICK_Y, MAX_JOYSTICK_Y, MIN_PWM, MAX_PWM);
+            pwmMotorEsquerdo1 = map(valorAnalogicoV, PARADO_JOYSTICK_Y, MAX_JOYSTICK_Y, MIN_PWM, MAX_PWM);
           }
         }
 
-        else if (valorAnalogicoV < (CENTER_ANALOG_Y - TOLERANCIA_ANALOGICO)) {
-
-          pwmMotorDireito1 = MIN_PWM;
+        // Analógico Y movimentado para frente
+        else if (valorAnalogicoV < (PARADO_JOYSTICK_Y - TOLERANCIA_JOYSTICK)) {
+          pwmMotorDireito2 = MIN_PWM;
           pwmMotorEsquerdo1 = MIN_PWM;
 
-          if (valorAnalogicoH > (CENTER_ANALOG_X + TOLERANCIA_ANALOGICO)) {
-            pwmMotorDireito2 = map(valorAnalogicoH + valorAnalogicoV,
-                                   CENTER_ANALOG_X + MIN_ANALOG_X,
-                                   MAX_ANALOG_X + CENTER_ANALOG_Y,
-                                   MIN_PWM,
-                                   MAX_PWM);
-
-            pwmMotorEsquerdo2 = map(valorAnalogicoH - valorAnalogicoV,
-                                    CENTER_ANALOG_X - CENTER_ANALOG_Y,
-                                    MAX_ANALOG_X - MIN_ANALOG_Y,
-                                    MIN_PWM,
-                                    MAX_PWM);
+          // Analógico X movimentado para direita
+          if (valorAnalogicoH > (PARADO_JOYSTICK_X + TOLERANCIA_JOYSTICK)) {
+            pwmMotorDireito1 = map(valorAnalogicoV + valorAnalogicoH,
+                                   MIN_JOYSTICK_Y + PARADO_JOYSTICK_X,
+                                   PARADO_JOYSTICK_Y + MAX_JOYSTICK_X,
+                                   MAX_PWM, MIN_PWM);
+            pwmMotorEsquerdo2 = map(valorAnalogicoV, MIN_JOYSTICK_Y, PARADO_JOYSTICK_Y, MAX_PWM, MIN_PWM);
           }
 
-          else if (valorAnalogicoH < (CENTER_ANALOG_X - TOLERANCIA_ANALOGICO)) {
-            pwmMotorDireito2 = map(valorAnalogicoH + valorAnalogicoV,
-                                   CENTER_ANALOG_X + CENTER_ANALOG_Y,
-                                   MIN_ANALOG_X + MIN_ANALOG_Y,
-                                   MIN_PWM,
-                                   MAX_PWM);
-
-            pwmMotorEsquerdo2 = map(valorAnalogicoH - valorAnalogicoV,
-                                    MIN_ANALOG_X - CENTER_ANALOG_Y,
-                                    CENTER_ANALOG_X - MIN_ANALOG_Y,
-                                    MIN_PWM,
-                                    MAX_PWM);
+          // Analógico X movimentado para esquerda
+          else if (valorAnalogicoH < (PARADO_JOYSTICK_X - TOLERANCIA_JOYSTICK)) {
+            pwmMotorDireito1 = map(valorAnalogicoV, MIN_JOYSTICK_Y, PARADO_JOYSTICK_Y, MAX_PWM, MIN_PWM);
+            pwmMotorEsquerdo2 = map(valorAnalogicoV - valorAnalogicoH,
+                                    MIN_JOYSTICK_Y - PARADO_JOYSTICK_X,
+                                    PARADO_JOYSTICK_Y - MIN_JOYSTICK_X,
+                                    MIN_PWM, MAX_PWM);
           }
 
+          // Analógico X não movimentado
           else {
-            pwmMotorDireito2 = map(valorAnalogicoV, CENTER_ANALOG_Y, MIN_ANALOG_Y, MIN_PWM, MAX_PWM);
-            pwmMotorEsquerdo2 = map(valorAnalogicoV, CENTER_ANALOG_Y, MIN_ANALOG_Y, MIN_PWM, MAX_PWM);
+            pwmMotorDireito1 = map(valorAnalogicoV, MIN_JOYSTICK_Y, PARADO_JOYSTICK_Y, MAX_PWM, MIN_PWM);
+            pwmMotorEsquerdo2 = map(valorAnalogicoV, MIN_JOYSTICK_Y, PARADO_JOYSTICK_Y, MAX_PWM, MIN_PWM);
           }
         }
 
+        // Analógico Y não movimentado
         else {
 
-          if (valorAnalogicoH > (CENTER_ANALOG_X + TOLERANCIA_ANALOGICO)) {
+          // Analógico X movimentado para direita
+          if (valorAnalogicoH > (PARADO_JOYSTICK_X + TOLERANCIA_JOYSTICK)) {
             pwmMotorDireito1 = MIN_PWM;
-            pwmMotorDireito2 = map(valorAnalogicoH, CENTER_ANALOG_X, MAX_ANALOG_X, MIN_PWM, MAX_PWM);
-            pwmMotorEsquerdo1 = map(valorAnalogicoH, CENTER_ANALOG_X, MAX_ANALOG_X, MIN_PWM, MAX_PWM);
+            pwmMotorEsquerdo1 = MIN_PWM;
+            pwmMotorDireito2 = map(valorAnalogicoH, PARADO_JOYSTICK_X, MAX_JOYSTICK_X, MIN_PWM, MAX_PWM);
+            pwmMotorEsquerdo2 = map(valorAnalogicoH, PARADO_JOYSTICK_X, MAX_JOYSTICK_X, MIN_PWM, MAX_PWM);
+          }
+
+          // Analógico X movimentado para esquerda
+          else if (valorAnalogicoH < (PARADO_JOYSTICK_X - TOLERANCIA_JOYSTICK)) {
+            pwmMotorDireito1 = map(valorAnalogicoH, MIN_JOYSTICK_X, PARADO_JOYSTICK_X, MAX_PWM, MIN_PWM);
+            pwmMotorEsquerdo1 = map(valorAnalogicoH, MIN_JOYSTICK_X, PARADO_JOYSTICK_X, MAX_PWM, MIN_PWM);
+            pwmMotorDireito2 = MIN_PWM;
             pwmMotorEsquerdo2 = MIN_PWM;
           }
 
-          else if (valorAnalogicoH < (CENTER_ANALOG_X - TOLERANCIA_ANALOGICO)) {
-            pwmMotorDireito1 = map(valorAnalogicoH, CENTER_ANALOG_X, MIN_ANALOG_X, MIN_PWM, MAX_PWM);
-            pwmMotorDireito2 = MIN_PWM;
-            pwmMotorEsquerdo1 = MIN_PWM;
-            pwmMotorEsquerdo2 = map(valorAnalogicoH, CENTER_ANALOG_X, MIN_ANALOG_X, MIN_PWM, MAX_PWM);
-          }
-
+          // Analógico X não movimentado
           else {
             pwmMotorDireito1 = MIN_PWM;
             pwmMotorEsquerdo1 = MIN_PWM;
@@ -307,7 +291,7 @@ void setup() {
   pinMode(PINO_2_MOTOR_DIREITO, OUTPUT);
 
   sentidoMotorEsquerdo = PINO_1_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_2_MOTOR_ESQUERDO;
-  sentidoMotorDireito = PINO_1_MOTOR_DIREITO, velocidadeMotorDireito = PINO_2_MOTOR_DIREITO;
+  sentidoMotorDireito = PINO_2_MOTOR_DIREITO, velocidadeMotorDireito = PINO_1_MOTOR_DIREITO;
 
   // Desliga movimentação e arma do robô.
   desligaRobo();
