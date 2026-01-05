@@ -2,7 +2,7 @@
 #include "parametros.h"
 
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
-bool roboLigado;
+bool roboLigado, configsTravadas;
 
 /* Foi necessário utilizar essas variáveis para permitir a 
    inversão do sentido de giro de cada motor de locomoção */
@@ -92,63 +92,78 @@ void processControllers() {
 
         /* --------------------- Lógica de funcionamento da arma --------------------- */
 
-        if (myController->brake() > 0) {
-          long velocidadeArma = map(myController->brake(), MIN_GATILHOS, MAX_GATILHOS, MIN_PWM, MAX_PWM);
+        // Se BOLINHA for pressionado, roda arma para um lado.
+        if (myController->b()) {
+          Serial.print("Arma Sentido 1\n");
           analogWrite(PINO_1_ARMA1, 0);
-          analogWrite(PINO_2_ARMA1, velocidadeArma);
-          analogWrite(PINO_1_ARMA2, velocidadeArma);
+          analogWrite(PINO_2_ARMA1, MAX_PWM);
+          analogWrite(PINO_1_ARMA2, MAX_PWM);
           analogWrite(PINO_2_ARMA2, 0);
         }
 
-        else if (myController->throttle() > 0) {
-          long velocidadeArma = map(myController->throttle(), MIN_GATILHOS, MAX_GATILHOS, MIN_PWM, MAX_PWM);
-          analogWrite(PINO_1_ARMA1, velocidadeArma);
+        // Se QUADRADO for pressionado, roda arma para o outro lado.
+        if (myController->x()) {
+          Serial.print("Arma Sentido 2\n");
+          analogWrite(PINO_1_ARMA1, MAX_PWM);
           analogWrite(PINO_2_ARMA1, 0);
           analogWrite(PINO_1_ARMA2, 0);
-          analogWrite(PINO_2_ARMA2, velocidadeArma);
+          analogWrite(PINO_2_ARMA2, MAX_PWM);
         }
 
-        else {
+        // Se TRIÂNGULO for presionado, desliga motores da arma.
+        if (myController->y()) {
+          Serial.print("Arma desligada\n");
           analogWrite(PINO_1_ARMA1, 0);
           analogWrite(PINO_2_ARMA1, 0);
           analogWrite(PINO_1_ARMA2, 0);
           analogWrite(PINO_2_ARMA2, 0);
+        }
+
+        /* ----------------- Lógica de trava das configurações ----------------- */
+
+        if (myController->thumbL() && myController->thumbR()) {
+          configsTravadas = !configsTravadas;
+          digitalWrite(PINO_LED_INTERNO, configsTravadas);
+          Serial.println(configsTravadas);
         }
 
         /* ----------------- Lógica de inversão dos analógicos de movimentação ----------------- */
 
-        // Se L1 for pressionado, locomoção Direito V - Esquerdo H
-        if (myController->l1()) {
-          direitoVesquerdoH = true, direitoHesquerdoV = false;
-        }
+        if (!configsTravadas) {  // Trava pra evitar de o público ficar alterando as configurações
 
-        // Se R1 for pressionado, locomoção Direito H - Esquerdo V
-        if (myController->r1()) {
-          direitoVesquerdoH = false, direitoHesquerdoV = true;
-        }
+          // Se L1 for pressionado, locomoção Direito V - Esquerdo H
+          if (myController->l1()) {
+            direitoVesquerdoH = true, direitoHesquerdoV = false;
+          }
 
-        /* ----------------- Lógica de inversão de giro da movimentação ----------------- */
+          // Se R1 for pressionado, locomoção Direito H - Esquerdo V
+          if (myController->r1()) {
+            direitoVesquerdoH = false, direitoHesquerdoV = true;
+          }
 
-        uint8_t leituraSetinhas = myController->dpad();
+          /* ----------------- Lógica de inversão de giro da movimentação ----------------- */
 
-        // Cada SETINHA representa uma configuração de pinos para os motores
-        switch (leituraSetinhas) {
-          case 0x01:  // cima
-            sentidoMotorEsquerdo = PINO_1_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_2_MOTOR_ESQUERDO;
-            sentidoMotorDireito = PINO_1_MOTOR_DIREITO, velocidadeMotorDireito = PINO_2_MOTOR_DIREITO;
-            break;
-          case 0x02:  // baixo
-            sentidoMotorEsquerdo = PINO_1_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_2_MOTOR_ESQUERDO;
-            sentidoMotorDireito = PINO_2_MOTOR_DIREITO, velocidadeMotorDireito = PINO_1_MOTOR_DIREITO;
-            break;
-          case 0x04:  // direita
-            sentidoMotorEsquerdo = PINO_2_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_1_MOTOR_ESQUERDO;
-            sentidoMotorDireito = PINO_1_MOTOR_DIREITO, velocidadeMotorDireito = PINO_2_MOTOR_DIREITO;
-            break;
-          case 0x08:  // esquerda
-            sentidoMotorEsquerdo = PINO_2_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_1_MOTOR_ESQUERDO;
-            sentidoMotorDireito = PINO_2_MOTOR_DIREITO, velocidadeMotorDireito = PINO_1_MOTOR_DIREITO;
-            break;
+          uint8_t leituraSetinhas = myController->dpad();
+
+          // Cada SETINHA representa uma configuração de pinos para os motores
+          switch (leituraSetinhas) {
+            case 0x01:  // cima
+              sentidoMotorEsquerdo = PINO_1_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_2_MOTOR_ESQUERDO;
+              sentidoMotorDireito = PINO_1_MOTOR_DIREITO, velocidadeMotorDireito = PINO_2_MOTOR_DIREITO;
+              break;
+            case 0x02:  // baixo
+              sentidoMotorEsquerdo = PINO_1_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_2_MOTOR_ESQUERDO;
+              sentidoMotorDireito = PINO_2_MOTOR_DIREITO, velocidadeMotorDireito = PINO_1_MOTOR_DIREITO;
+              break;
+            case 0x04:  // direita
+              sentidoMotorEsquerdo = PINO_2_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_1_MOTOR_ESQUERDO;
+              sentidoMotorDireito = PINO_1_MOTOR_DIREITO, velocidadeMotorDireito = PINO_2_MOTOR_DIREITO;
+              break;
+            case 0x08:  // esquerda
+              sentidoMotorEsquerdo = PINO_2_MOTOR_ESQUERDO, velocidadeMotorEsquerdo = PINO_1_MOTOR_ESQUERDO;
+              sentidoMotorDireito = PINO_2_MOTOR_DIREITO, velocidadeMotorDireito = PINO_1_MOTOR_DIREITO;
+              break;
+          }
         }
 
         /* ----------------- Lógica de funcionamento da movimentação ----------------- */
@@ -302,6 +317,9 @@ void setup() {
   // Desparea os controles que haviam sido conectados anteriormente.
   // BP32.forgetBluetoothKeys();
 
+  pinMode(PINO_LED_INTERNO, OUTPUT);
+  digitalWrite(PINO_LED_INTERNO, LOW);
+
   // Configura pinos da ESP32 para controle dos motores de arma.
   pinMode(PINO_1_ARMA1, OUTPUT);
   pinMode(PINO_2_ARMA1, OUTPUT);
@@ -320,6 +338,7 @@ void setup() {
   sentidoMotorDireito = PINO_2_MOTOR_DIREITO, velocidadeMotorDireito = PINO_1_MOTOR_DIREITO;
 
   direitoVesquerdoH = true, direitoHesquerdoV = false;
+  configsTravadas = false;
 
   // Desliga movimentação e arma do robô.
   desligaRobo();

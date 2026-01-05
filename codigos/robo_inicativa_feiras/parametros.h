@@ -4,6 +4,8 @@
 
 #include <Arduino.h>
 
+#define PINO_LED_INTERNO 2
+
 #define PINO_1_ARMA2 13
 #define PINO_2_ARMA2 12
 
@@ -26,8 +28,6 @@
 
 const int32_t MIN_JOYSTICK_Y = -512, PARADO_JOYSTICK_Y = 0, MAX_JOYSTICK_Y = 508;
 const int32_t MIN_JOYSTICK_X = -512, PARADO_JOYSTICK_X = 0, MAX_JOYSTICK_X = 508;
-
-const int32_t MIN_GATILHOS = 0, MAX_GATILHOS = 1023;
 
 const int32_t TOLERANCIA_JOYSTICK = 5;  // zona morta do controle
 
