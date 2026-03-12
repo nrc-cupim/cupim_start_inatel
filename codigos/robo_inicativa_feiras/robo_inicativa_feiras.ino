@@ -127,9 +127,10 @@ void processControllers() {
           Serial.println(configsTravadas);
         }
 
-        /* ----------------- Lógica de inversão dos analógicos de movimentação ----------------- */
+        // Trava pra evitar de alterar as configurações do controle durante a partida
+        if (!configsTravadas) {
 
-        if (!configsTravadas) {  // Trava pra evitar de o público ficar alterando as configurações
+          /* ----------------- Lógica de inversão dos analógicos de movimentação ----------------- */
 
           // Se L1 for pressionado, locomoção Direito V - Esquerdo H
           if (myController->l1()) {
