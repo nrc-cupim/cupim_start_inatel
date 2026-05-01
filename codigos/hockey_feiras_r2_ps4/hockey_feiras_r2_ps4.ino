@@ -1,7 +1,14 @@
 #include <PS4Controller.h>
 #include "parametros.h"
+#include "esp_bt_main.h"
+#include "esp_bt_device.h"
+#include "esp_gap_bt_api.h"
 
-bool roboLigado, configsTravadas;
+// const char* macAddress = "dc:97:ba:e7:d9:36";
+const char* macAddress = "a8:47:4a:bc:ab:fa";
+const int r = 255, g = 255, b = 255;	
+
+bool roboLigado, configsTravadas, jaEstavaConectado;
 
 /* Foi necessário utilizar essas variáveis para permitir a 
    inversão do sentido de giro de cada motor de locomoção */
@@ -234,8 +241,8 @@ void processControllers() {
 
 void setup() {
   Serial.begin(115200);
-  PS4.begin("88:13:bf:70:6a:f6");  // MAC salvo no controle
-  Serial.printf("Battery Level : %d\n", PS4.Battery());
+  // PS4.begin("f4:cf:a2:8d:61:cb");  // MAC salvo no controle
+  PS4.begin(macAddress);
 
   pinMode(PINO_LED_INTERNO, OUTPUT);
   digitalWrite(PINO_LED_INTERNO, LOW);
@@ -252,12 +259,37 @@ void setup() {
   desligaRobo();
 
   direitoVesquerdoH = true, direitoHesquerdoV = false;
-  configsTravadas = false;
+  configsTravadas = false, jaEstavaConectado = false;
 }
 
 void loop() {
-  if (PS4.isConnected())
+  if (PS4.isConnected()) {
+
+    if (!jaEstavaConectado) {
+      // Controle fica bloqueado para novas conexões e invisível para novos dispositivos
+      esp_bt_gap_set_scan_mode(ESP_BT_NON_CONNECTABLE, ESP_BT_NON_DISCOVERABLE);
+      PS4.setLed(r, g, b);
+      PS4.sendToController();
+      jaEstavaConectado = true;
+
+      // const uint8_t* mac = PS4.latestPacket().btAddr;
+      // Serial.print("Controle Conectado! Endereço MAC: ");
+      // for (int i = 0; i < 6; i++) {
+      //   Serial.printf("%02X", mac[i]);
+      //   if (i < 5) Serial.print(":");
+      // }
+      Serial.println();
+      Serial.printf("Nível da Bateria: %d\n", PS4.Battery());
+    }
+
     processControllers();
-  else
+  }
+
+  else {
     desligaRobo();
+    if (jaEstavaConectado) {
+      esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
+      jaEstavaConectado = false;
+    }
+  }
 }

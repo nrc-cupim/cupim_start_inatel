@@ -263,7 +263,7 @@ void processControllers() {
 
 void setup() {
   Serial.begin(115200);
-  PS4.begin("88:13:bf:70:6a:f6");  // MAC salvo no controle
+  PS4.begin("f4:cf:a2:8d:61:cb");  // MAC salvo no controle
   Serial.printf("Battery Level : %d\n", PS4.Battery());
 
   pinMode(PINO_LED_INTERNO, OUTPUT);
