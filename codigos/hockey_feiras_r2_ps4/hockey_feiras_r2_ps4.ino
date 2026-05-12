@@ -6,7 +6,7 @@
 
 // const char* macAddress = "dc:97:ba:e7:d9:36";
 const char* macAddress = "a8:47:4a:bc:ab:fa";
-const int r = 255, g = 255, b = 255;	
+const int r = 255, g = 255, b = 255;
 
 bool roboLigado, configsTravadas, jaEstavaConectado;
 
@@ -17,6 +17,25 @@ int sentidoMotorEsquerdo, velocidadeMotorEsquerdo;
 int sentidoMotorDireito, velocidadeMotorDireito;
 
 bool direitoVesquerdoH, direitoHesquerdoV;
+
+void clearBluetoothBonds() {
+  int pairedDeviceCount = esp_bt_gap_get_bond_device_num();
+
+  Serial.println(pairedDeviceCount);
+
+  if (pairedDeviceCount == 0) return;
+
+  esp_bd_addr_t pairedDeviceBtAddr[pairedDeviceCount];
+
+  esp_bt_gap_get_bond_device_list(
+    &pairedDeviceCount,
+    pairedDeviceBtAddr);
+
+  for (int i = 0; i < pairedDeviceCount; i++) {
+    esp_bt_gap_remove_bond_device(
+      pairedDeviceBtAddr[i]);
+  }
+}
 
 void desligaRobo() {
   analogWrite(sentidoMotorDireito, 0);
@@ -241,8 +260,8 @@ void processControllers() {
 
 void setup() {
   Serial.begin(115200);
-  // PS4.begin("f4:cf:a2:8d:61:cb");  // MAC salvo no controle
   PS4.begin(macAddress);
+  clearBluetoothBonds();
 
   pinMode(PINO_LED_INTERNO, OUTPUT);
   digitalWrite(PINO_LED_INTERNO, LOW);
@@ -288,8 +307,10 @@ void loop() {
   else {
     desligaRobo();
     if (jaEstavaConectado) {
-      esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
-      jaEstavaConectado = false;
+      // esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
+      // jaEstavaConectado = false;
+      delay(500);
+      ESP.restart();
     }
   }
 }
