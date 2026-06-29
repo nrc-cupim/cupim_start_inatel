@@ -23,7 +23,7 @@
 const int32_t MIN_ANALOG_Y = -128, CENTER_ANALOG_Y = 0, MAX_ANALOG_Y = 127;
 const int32_t MIN_ANALOG_X = -128, CENTER_ANALOG_X = 0, MAX_ANALOG_X = 127;
 
-const int32_t TOLERANCIA_ANALOGICO = 3;  // zona morta do controle
+const int32_t TOLERANCIA_ANALOGICO = 20;  // zona morta do controle
 
 // Pino de controle em HIGH: 255 (menor velocidade) a 0 (maior velocidade)
 // Pino de controle em LOW: 0 (menor velocidade) a 255 (maior velocidade)

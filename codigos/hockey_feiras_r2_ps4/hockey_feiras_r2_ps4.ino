@@ -6,7 +6,7 @@
 
 // const char* macAddress = "dc:97:ba:e7:d9:36";
 const char* macAddress = "a8:47:4a:bc:ab:fa";
-const int r = 255, g = 255, b = 255;
+const int r = 255, g = 255, b = 0;
 
 bool roboLigado, configsTravadas, jaEstavaConectado;
 
